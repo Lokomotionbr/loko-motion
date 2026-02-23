@@ -36,7 +36,7 @@ export default function LokoMotionApp() {
 
     boot();
 
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+    const { data: sub } = supabase.auth.onAuthStateChange(async (_event: any, newSession: any) => {
       setSession(newSession);
       if (newSession?.user?.id) {
         const { data: entData } = await supabase
