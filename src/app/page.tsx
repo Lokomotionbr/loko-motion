@@ -1,4 +1,5 @@
 "use client";
+import Studio from "@/components/Studio";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Card,
