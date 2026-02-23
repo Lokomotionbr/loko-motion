@@ -1,7 +1,7 @@
 "use client";
 
-import LokoMotionApp from "@/app/page.auth";
+import Builder from "@/components/Builder";
 
 export default function Studio() {
-  return <LokoMotionApp />;
+  return <Builder />;
 }
