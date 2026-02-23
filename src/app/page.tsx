@@ -1,5 +1,5 @@
-import Studio from "@/components/Studio";
+import LokoMotionApp from "./page.auth";
 
 export default function Page() {
-  return <Studio />;
+  return <LokoMotionApp />;
 }
