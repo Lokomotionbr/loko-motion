@@ -624,7 +624,6 @@ function takeToPromptText(t: TakeSpec, lang: Lang): string {
 }
 
 export default function Builder() {
-    
   // ALWAYS default to Story tab for first open
   const [mainTab, setMainTab] = useState<"story" | "prompt">("story");
 
