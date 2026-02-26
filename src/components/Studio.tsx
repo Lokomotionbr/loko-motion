@@ -1,7 +1,16 @@
+<div style={{
+  padding: 8,
+  background: "#fffbcc",
+  borderBottom: "1px solid #e6d200",
+  fontSize: 12
+}}>
+  ✅ STUDIO ATIVO — build: {new Date().toISOString()}
+</div>
+
 "use client";
 
 import { useState } from "react";
-import Builder from "./Builder";
+import Builder from "./ui/Builder";
 import LokoSEO from "./LokoSEO";
 
 export default function Studio() {
