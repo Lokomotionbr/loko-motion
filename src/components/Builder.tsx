@@ -151,9 +151,7 @@ const DEFAULT_HARD_RULES =
   "Hard rules:\n- No text/subtitles/UI/watermarks.\n- Keep faces on-model; keep outfit consistent.\n- Avoid 3D shading, volumetric CGI look, plastic skin.";
 
 function uid(prefix = "id") {
-  return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(
-    16
-  )}`;
+  return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
 }
 
 // =====================
@@ -280,10 +278,7 @@ function buildEpisode1PT(i: StoryInputs): { script: string; takes: TakeSpec[] } 
   );
 
   const p = safeLine(i.protagonistName, "Protagonista");
-  const pCore = safeLine(
-    i.protagonistCore,
-    "um coração teimoso e um olhar atento"
-  );
+  const pCore = safeLine(i.protagonistCore, "um coração teimoso e um olhar atento");
   const pWant = safeLine(i.protagonistWant, "pertencer a algum lugar");
   const pFear = safeLine(i.protagonistFear, "não ser suficiente");
 
@@ -468,10 +463,7 @@ function buildEpisode1PT(i: StoryInputs): { script: string; takes: TakeSpec[] } 
 
     const t1: TakeSpec = {
       id: uid("take"),
-      label: `TAKE ${String(base + 1).padStart(
-        2,
-        "0"
-      )} (${baseLabel}) — Establish / mood`,
+      label: `TAKE ${String(base + 1).padStart(2, "0")} (${baseLabel}) — Establish / mood`,
       duration: durations[sceneIdx % durations.length],
       shot: "wide",
       motion: "tracking pan",
@@ -488,10 +480,7 @@ function buildEpisode1PT(i: StoryInputs): { script: string; takes: TakeSpec[] } 
 
     const t2: TakeSpec = {
       id: uid("take"),
-      label: `TAKE ${String(base + 2).padStart(
-        2,
-        "0"
-      )} (${baseLabel}) — Acting beat`,
+      label: `TAKE ${String(base + 2).padStart(2, "0")} (${baseLabel}) — Acting beat`,
       duration: "10s",
       shot: "close-up",
       motion: "slow push-in",
@@ -508,10 +497,7 @@ function buildEpisode1PT(i: StoryInputs): { script: string; takes: TakeSpec[] } 
 
     const t3: TakeSpec = {
       id: uid("take"),
-      label: `TAKE ${String(base + 3).padStart(
-        2,
-        "0"
-      )} (${baseLabel}) — Action / turn`,
+      label: `TAKE ${String(base + 3).padStart(2, "0")} (${baseLabel}) — Action / turn`,
       duration: "12s",
       shot: "medium",
       motion: "orbit micro",
@@ -535,10 +521,7 @@ function buildEpisode1PT(i: StoryInputs): { script: string; takes: TakeSpec[] } 
 
   takes.push({
     id: uid("take"),
-    label: `TAKE ${String(takes.length + 1).padStart(
-      2,
-      "0"
-    )} (FINAL) — Cliffhanger sky map`,
+    label: `TAKE ${String(takes.length + 1).padStart(2, "0")} (FINAL) — Cliffhanger sky map`,
     duration: "10s",
     shot: "wide",
     motion: "static lock",
@@ -552,22 +535,6 @@ function buildEpisode1PT(i: StoryInputs): { script: string; takes: TakeSpec[] } 
     perf2: "Eyeline fixo no céu; emoção contida.",
     vfx: "Tempestade, brilho, partículas finas; sem volumetric CGI.",
   });
-
-  (function storyBuilderTests() {
-    const s = lines.join("\n");
-    console.assert(
-      s.includes("ROTEIRO EM CENAS"),
-      "EP1 script should include scenes section"
-    );
-    console.assert(
-      s.includes("CLIFFHANGER"),
-      "EP1 script should include cliffhanger"
-    );
-    console.assert(
-      takes.length >= sceneCount * 3,
-      "Takes should be generated per scene"
-    );
-  })();
 
   return { script: clampLines(lines.join("\n")), takes };
 }
@@ -611,10 +578,7 @@ function buildStoryOutput(i: StoryInputs, lang: Lang): StoryOutput {
   bibleLines.push("");
   bibleLines.push("FORÇA CONTRÁRIA:");
   bibleLines.push(
-    `${ant} — ${safeLine(
-      i.antagonistForce,
-      "uma presença que distorce sinais"
-    )}`
+    `${ant} — ${safeLine(i.antagonistForce, "uma presença que distorce sinais")}`
   );
   bibleLines.push("");
   bibleLines.push("MUNDO (1 linha):");
@@ -656,9 +620,7 @@ function takeToPromptText(t: TakeSpec, lang: Lang): string {
   const cine =
     `${cineHeading}\n` +
     `${lang === "PT" ? "Plano" : "Shot"}: ${t.shot}\n` +
-    `${lang === "PT" ? "Movimento" : "Motion"}: ${
-      t.motion
-    } (only one movement)`;
+    `${lang === "PT" ? "Movimento" : "Motion"}: ${t.motion} (only one movement)`;
 
   const acts = `${actsHeading}\n- Beat 1: ${t.beat1}\n- Beat 2: ${t.beat2}\n- Beat 3: ${t.beat3}`;
   const perf = `${perfHeading}\n- ${t.perf1}\n- ${t.perf2}`;
@@ -725,49 +687,6 @@ export default function Builder() {
     { id: "d2", who: "Personagem B", line: "" },
   ]);
 
-  // Simple Prompt Builder
-  const [simpleDescription, setSimpleDescription] = useState("");
-  const [simpleCharacters, setSimpleCharacters] = useState("");
-  const [simpleOutfit, setSimpleOutfit] = useState("");
-  const [simplePlace, setSimplePlace] = useState<
-    | "rooftop"
-    | "penthouse"
-    | "street"
-    | "alley"
-    | "lab"
-    | "city skyline"
-    | "interior room"
-  >("penthouse");
-  const [simpleTime, setSimpleTime] = useState<"dawn" | "day" | "sunset" | "night">(
-    "night"
-  );
-  const [simpleWeather, setSimpleWeather] = useState<
-    "clear" | "rain" | "storm" | "fog" | "windy"
-  >("storm");
-  const [simpleMood, setSimpleMood] = useState<
-    "epic" | "tense" | "intimate" | "mysterious" | "horror"
-  >("tense");
-  const [simplePace, setSimplePace] = useState<"slow" | "medium" | "fast">("medium");
-
-  const [fxGlitch, setFxGlitch] = useState(true);
-  const [fxPixels, setFxPixels] = useState(false);
-  const [fxFireSmoke, setFxFireSmoke] = useState(true);
-  const [fxLightning, setFxLightning] = useState(true);
-  const [fxRainStreaks, setFxRainStreaks] = useState(true);
-  const [fxEmbers, setFxEmbers] = useState(true);
-
-  const [simpleShot, setSimpleShot] = useState<"wide" | "medium" | "close-up">("medium");
-  const [simpleMotion, setSimpleMotion] = useState<
-    "slow push-in" | "tracking pan" | "orbit micro" | "static lock" | "handheld subtle"
-  >("slow push-in");
-  const [simpleAngle, setSimpleAngle] = useState<
-    "low angle" | "eye-level" | "high angle" | ""
-  >("low angle");
-
-  const [simpleRatio, setSimpleRatio] = useState<"9:16" | "16:9">("9:16");
-  const [simpleDuration, setSimpleDuration] = useState<"5s" | "10s" | "15s">("10s");
-  const [simpleRating, setSimpleRating] = useState<"PG" | "PG-13">("PG-13");
-
   // Story Builder
   const [storyInputs, setStoryInputs] = useState<StoryInputs>({
     seriesTitle: "",
@@ -787,8 +706,7 @@ export default function Builder() {
     worldRules:
       "Energia cósmica deixa rastros; tecnologia reage a emoções; e cada uso tem um custo.",
     theme: "coragem mesmo com medo",
-    setPiece:
-      "chuva de meteoros + prédios dissolvendo em pixels quando a força passa perto",
+    setPiece: "chuva de meteoros + prédios dissolvendo em pixels quando a força passa perto",
   });
 
   const [storyOut, setStoryOut] = useState<StoryOutput | null>(null);
@@ -814,9 +732,7 @@ export default function Builder() {
 
     const cineLines: string[] = [];
     cineLines.push(
-      `${t.cameraShotLabel}: ${shot}${
-        angle ? ", " + angle : ""
-      }${distance ? ", " + distance : ""}`
+      `${t.cameraShotLabel}: ${shot}${angle ? ", " + angle : ""}${distance ? ", " + distance : ""}`
     );
     cineLines.push(`${t.cameraMotionLabel}: ${motion} ${t.onlyOneMove}`);
     if (dof) cineLines.push(`${t.dofLabel}: ${dof}`);
@@ -845,9 +761,7 @@ export default function Builder() {
         .filter(Boolean) as string[];
 
       blocks.push(
-        `${t.dialHeading}\n${
-          lines.length ? lines.join("\n") : t.dialoguePlaceholder
-        }`
+        `${t.dialHeading}\n${lines.length ? lines.join("\n") : t.dialoguePlaceholder}`
       );
     }
 
@@ -897,6 +811,34 @@ export default function Builder() {
     }
   }
 
+  function generateStoryEP1() {
+    const out = buildStoryOutput(storyInputs, language);
+    setStoryOut(out);
+    setSelectedTakeId(null);
+    if (typeof window !== "undefined") window.location.hash = "#story";
+  }
+
+  function applyTakeToPromptBuilder(take: TakeSpec) {
+    setMainTab("prompt");
+    setIncludeFormat(true);
+    setFormatLine(`FORMAT: 4K • 24fps • 9:16 • ${take.duration} • PG-13.`);
+    setShot(take.shot);
+    setMotion(take.motion as any);
+    setAngle("");
+    setDistance("");
+    setDof("");
+    setLightingPalette("");
+    setProseScene(take.prose);
+    setBeat1(take.beat1);
+    setBeat2(take.beat2);
+    setBeat3(take.beat3);
+    setPerf1(take.perf1);
+    setPerf2(take.perf2);
+    setSelectedTakeId(take.id);
+
+    if (typeof window !== "undefined") window.location.hash = "#prompt";
+  }
+
   function resetAll() {
     setLanguage("PT");
     setMainTab("story");
@@ -924,27 +866,6 @@ export default function Builder() {
       { id: "d2", who: "Personagem B", line: "" },
     ]);
 
-    setSimpleDescription("");
-    setSimpleCharacters("");
-    setSimpleOutfit("");
-    setSimplePlace("penthouse");
-    setSimpleTime("night");
-    setSimpleWeather("storm");
-    setSimpleMood("tense");
-    setSimplePace("medium");
-    setFxGlitch(true);
-    setFxPixels(false);
-    setFxFireSmoke(true);
-    setFxLightning(true);
-    setFxRainStreaks(true);
-    setFxEmbers(true);
-    setSimpleShot("medium");
-    setSimpleMotion("slow push-in");
-    setSimpleAngle("low angle");
-    setSimpleRatio("9:16");
-    setSimpleDuration("10s");
-    setSimpleRating("PG-13");
-
     setStoryOut(null);
     setSelectedTakeId(null);
     setStoryInputs((prev) => ({
@@ -956,191 +877,11 @@ export default function Builder() {
   }
 
   function addDialogueLine() {
-    setDialogue((prev) => [
-      ...prev,
-      { id: uid("d"), who: "Personagem", line: "" },
-    ]);
+    setDialogue((prev) => [...prev, { id: uid("d"), who: "Personagem", line: "" }]);
   }
 
   function removeDialogueLine(id: string) {
     setDialogue((prev) => prev.filter((d) => d.id !== id));
-  }
-
-  function autoBuildFromSimple() {
-    setFormatLine(
-      `FORMAT: 4K • 24fps • ${simpleRatio} • ${simpleDuration} • ${simpleRating}.`
-    );
-
-    setShot(simpleShot);
-    setMotion(simpleMotion as any);
-    setAngle(simpleAngle);
-    setDistance(
-      simpleShot === "wide"
-        ? "city-scale distance"
-        : simpleShot === "close-up"
-        ? "tight framing"
-        : "mid framing"
-    );
-
-    const weatherLight =
-      simpleWeather === "storm"
-        ? "lightning-blue flashes"
-        : simpleWeather === "rain"
-        ? "wet reflections and soft streetlight"
-        : simpleWeather === "fog"
-        ? "diffused haze lighting"
-        : simpleWeather === "windy"
-        ? "hard rim light with drifting debris"
-        : "clean key light";
-
-    const moodPalette =
-      simpleMood === "epic"
-        ? "fire-orange + deep smoke-gray + electric cyan accents"
-        : simpleMood === "horror"
-        ? "cold blue shadows + sharp red rim"
-        : simpleMood === "intimate"
-        ? "warm practicals + soft rim"
-        : simpleMood === "mysterious"
-        ? "neon magenta/cyan with deep blacks"
-        : "high-contrast key + rim";
-
-    const fxBits = [
-      fxLightning ? "lightning silhouettes" : null,
-      fxFireSmoke ? "always-moving fire and smoke" : null,
-      fxRainStreaks ? "diagonal rain streaks" : null,
-      fxEmbers ? "embers drifting" : null,
-      fxGlitch ? "subtle glitch shimmer accents" : null,
-      fxPixels ? "pixel-disintegration effect" : null,
-    ].filter(Boolean) as string[];
-
-    setLightingPalette(
-      `${weatherLight}; ${moodPalette}; ${fxBits.join(", ")}.`
-    );
-
-    const placeText =
-      simplePlace === "penthouse"
-        ? "inside a luxury penthouse, at a tall glass window"
-        : simplePlace === "rooftop"
-        ? "on a rooftop overlooking the city"
-        : simplePlace === "street"
-        ? "on a street between tall buildings"
-        : simplePlace === "alley"
-        ? "in a narrow alley with neon reflections"
-        : simplePlace === "lab"
-        ? "inside a lab with flickering monitors"
-        : simplePlace === "city skyline"
-        ? "with a full skyline view"
-        : "inside a room";
-
-    const timeText =
-      simpleTime === "night"
-        ? "at night"
-        : simpleTime === "sunset"
-        ? "at sunset"
-        : simpleTime === "dawn"
-        ? "at dawn"
-        : "in daylight";
-
-    const weatherText =
-      simpleWeather === "storm"
-        ? "violent thunderstorm"
-        : simpleWeather === "rain"
-        ? "heavy rain"
-        : simpleWeather === "fog"
-        ? "thick fog"
-        : simpleWeather === "windy"
-        ? "strong wind"
-        : "clear air";
-
-    const charLine = simpleCharacters.trim()
-      ? `Characters: ${simpleCharacters.trim()}.`
-      : "";
-    const outfitLine = simpleOutfit.trim()
-      ? `Outfit details: ${simpleOutfit.trim()}.`
-      : "";
-    const fxLine = fxBits.length
-      ? `Environmental motion: ${fxBits.join(", ")}.`
-      : "Environmental motion stays active; nothing is static.";
-
-    const coreDesc =
-      clampLines(simpleDescription) || "Describe the scene in 1–3 simple sentences.";
-
-    setProseScene(
-      clampLines(
-        `${coreDesc}\n${charLine}${outfitLine ? "\n" + outfitLine : ""}\nSetting: ${placeText}, ${timeText}, ${weatherText}.\nVisual details: wet glass reflections, drifting smoke layers, flickering firelight, moving clouds. ${fxLine}`
-      )
-    );
-
-    const paceHint =
-      simplePace === "slow"
-        ? "slow and controlled"
-        : simplePace === "fast"
-        ? "fast, punchy"
-        : "steady";
-
-    setBeat1(
-      simpleShot === "close-up"
-        ? `0:00–0:03 (${paceHint}): Close-up on the character; a small micro-move (finger tightens on glass or cup).`
-        : `0:00–0:03 (${paceHint}): Establish the space; camera commits to one clean move (${simpleMotion}).`
-    );
-    setBeat2(
-      "0:03–0:07: Half-second hold for micro-acting; eyes track something outside; breath changes."
-    );
-    setBeat3(
-      fxPixels
-        ? "0:07–end: A key event hits; nearby structure starts pixel-disintegrating in a clean stylized way; hard cut."
-        : "0:07–end: A key event hits; lighting spikes (fire or lightning); finish on a strong silhouette; hard cut."
-    );
-
-    const moodActing =
-      simpleMood === "horror"
-        ? "predatory calm, minimal blinking, controlled breath"
-        : simpleMood === "intimate"
-        ? "soft breath, subtle hesitation, warm eye focus"
-        : simpleMood === "epic"
-        ? "commanding presence, steady posture, eyes locked"
-        : simpleMood === "mysterious"
-        ? "contained emotion, slight smirk, eyes half-hidden"
-        : "tension held in jaw and shoulders";
-
-    setPerf1(`${moodActing}; add a 0.3–0.5s hold on the strongest emotion.`);
-    setPerf2(
-      "Eyeline is motivated (looking at the city / threat). Micro facial shifts only; keep it realistic."
-    );
-
-    setHardRules(
-      clampLines(
-        `${DEFAULT_HARD_RULES}\n- Keep environmental motion continuous (fire/smoke/clouds).\n- If using pixel breakup: clean digital disintegration, no messy rubble simulation.`
-      )
-    );
-  }
-
-  function applyTakeToPromptBuilder(take: TakeSpec) {
-    setMainTab("prompt");
-    setIncludeFormat(true);
-    setFormatLine(`FORMAT: 4K • 24fps • 9:16 • ${take.duration} • PG-13.`);
-    setShot(take.shot);
-    setMotion(take.motion as any);
-    setAngle("");
-    setDistance("");
-    setDof("");
-    setLightingPalette("");
-    setProseScene(take.prose);
-    setBeat1(take.beat1);
-    setBeat2(take.beat2);
-    setBeat3(take.beat3);
-    setPerf1(take.perf1);
-    setPerf2(take.perf2);
-    setSelectedTakeId(take.id);
-
-    if (typeof window !== "undefined") window.location.hash = "#prompt";
-  }
-
-  function generateStoryEP1() {
-    const out = buildStoryOutput(storyInputs, language);
-    setStoryOut(out);
-    setSelectedTakeId(null);
-    if (typeof window !== "undefined") window.location.hash = "#story";
   }
 
   return (
@@ -1161,18 +902,14 @@ export default function Builder() {
               </Badge>
             </div>
             <p className="text-sm text-zinc-600">
-              Plano Starter: gere o Episódio 1 (roteiro + take list) e transforme cada
-              take em prompt pronto para o Sora.
+              Plano Starter: gere o Episódio 1 (roteiro + take list) e transforme cada take em prompt pronto para o Sora.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
               <Label className="text-xs text-zinc-600">Idioma</Label>
-              <Select
-                value={language}
-                onValueChange={(v) => setLanguage(v as Lang)}
-              >
+              <Select value={language} onValueChange={(v) => setLanguage(v as Lang)}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue />
                 </SelectTrigger>
@@ -1193,11 +930,7 @@ export default function Builder() {
           </div>
         </div>
 
-        <Tabs
-          value={mainTab}
-          onValueChange={(v) => setMainTab(v as any)}
-          className="mt-6"
-        >
+        <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)} className="mt-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="story" className="gap-2">
               <ScrollText className="h-4 w-4" /> Roteiro Builder (EP1)
@@ -1207,7 +940,6 @@ export default function Builder() {
             </TabsTrigger>
           </TabsList>
 
-          {/* ===================== STORY BUILDER ===================== */}
           <TabsContent value="story" className="mt-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Card className="rounded-2xl shadow-sm">
@@ -1226,10 +958,7 @@ export default function Builder() {
                       <Input
                         value={storyInputs.seriesTitle}
                         onChange={(e) =>
-                          setStoryInputs((p) => ({
-                            ...p,
-                            seriesTitle: e.target.value,
-                          }))
+                          setStoryInputs((p) => ({ ...p, seriesTitle: e.target.value }))
                         }
                         placeholder="Ex: Guardiã das Galáxias"
                       />
@@ -1260,14 +989,11 @@ export default function Builder() {
                     <Label>Descrição simples da história (1–3 frases)</Label>
                     <Textarea
                       value={storyInputs.logline}
-                      onChange={(e) =>
-                        setStoryInputs((p) => ({ ...p, logline: e.target.value }))
-                      }
+                      onChange={(e) => setStoryInputs((p) => ({ ...p, logline: e.target.value }))}
                       className="min-h-[110px]"
                     />
                     <div className="text-xs text-zinc-600">
-                      Escreve como você falaria com um amigo. O builder organiza e transforma
-                      em estrutura de roteiro.
+                      Escreve como você falaria com um amigo. O builder organiza e transforma em estrutura de roteiro.
                     </div>
                   </div>
 
@@ -1279,10 +1005,7 @@ export default function Builder() {
                       <Input
                         value={storyInputs.protagonistName}
                         onChange={(e) =>
-                          setStoryInputs((p) => ({
-                            ...p,
-                            protagonistName: e.target.value,
-                          }))
+                          setStoryInputs((p) => ({ ...p, protagonistName: e.target.value }))
                         }
                         placeholder="Ex: Luna"
                       />
@@ -1292,10 +1015,7 @@ export default function Builder() {
                       <Input
                         value={storyInputs.antagonistName}
                         onChange={(e) =>
-                          setStoryInputs((p) => ({
-                            ...p,
-                            antagonistName: e.target.value,
-                          }))
+                          setStoryInputs((p) => ({ ...p, antagonistName: e.target.value }))
                         }
                         placeholder="Ex: Noctvi (ou 'A Sombra')"
                       />
@@ -1307,10 +1027,7 @@ export default function Builder() {
                     <Input
                       value={storyInputs.protagonistCore}
                       onChange={(e) =>
-                        setStoryInputs((p) => ({
-                          ...p,
-                          protagonistCore: e.target.value,
-                        }))
+                        setStoryInputs((p) => ({ ...p, protagonistCore: e.target.value }))
                       }
                       placeholder="Ex: curiosa, corajosa, mas se sente sozinha"
                     />
@@ -1322,10 +1039,7 @@ export default function Builder() {
                       <Input
                         value={storyInputs.protagonistWant}
                         onChange={(e) =>
-                          setStoryInputs((p) => ({
-                            ...p,
-                            protagonistWant: e.target.value,
-                          }))
+                          setStoryInputs((p) => ({ ...p, protagonistWant: e.target.value }))
                         }
                         placeholder="Ex: salvar alguém e encontrar seu lugar"
                       />
@@ -1335,10 +1049,7 @@ export default function Builder() {
                       <Input
                         value={storyInputs.protagonistFear}
                         onChange={(e) =>
-                          setStoryInputs((p) => ({
-                            ...p,
-                            protagonistFear: e.target.value,
-                          }))
+                          setStoryInputs((p) => ({ ...p, protagonistFear: e.target.value }))
                         }
                         placeholder="Ex: falhar e perder quem ama"
                       />
@@ -1403,10 +1114,7 @@ export default function Builder() {
                     <Input
                       value={storyInputs.worldOneLine}
                       onChange={(e) =>
-                        setStoryInputs((p) => ({
-                          ...p,
-                          worldOneLine: e.target.value,
-                        }))
+                        setStoryInputs((p) => ({ ...p, worldOneLine: e.target.value }))
                       }
                       placeholder="Ex: Cidade em tempestade eterna, luzes neon e falhas no céu"
                     />
@@ -1417,10 +1125,7 @@ export default function Builder() {
                     <Textarea
                       value={storyInputs.worldRules}
                       onChange={(e) =>
-                        setStoryInputs((p) => ({
-                          ...p,
-                          worldRules: e.target.value,
-                        }))
+                        setStoryInputs((p) => ({ ...p, worldRules: e.target.value }))
                       }
                       className="min-h-[90px]"
                     />
@@ -1456,8 +1161,7 @@ export default function Builder() {
                   <div className="rounded-2xl border bg-zinc-50 p-3 text-xs text-zinc-700">
                     <div className="font-medium">Como usar depois:</div>
                     <div className="mt-1">
-                      1) Gera o EP1 + takes aqui. 2) Clique em um take e <b>Enviar</b>. 3)
-                      Ajuste e copie o prompt.
+                      1) Gera o EP1 + takes aqui. 2) Clique em um take e <b>Enviar</b>. 3) Ajuste e copie o prompt.
                     </div>
                   </div>
                 </CardContent>
@@ -1531,6 +1235,7 @@ export default function Builder() {
                             <Copy className="h-4 w-4" />{" "}
                             {copiedStory === "ep1" ? "Copiado!" : "Copiar roteiro"}
                           </Button>
+
                           <Button
                             variant="outline"
                             className="gap-2"
@@ -1621,7 +1326,6 @@ export default function Builder() {
             </div>
           </TabsContent>
 
-          {/* ===================== PROMPT BUILDER ===================== */}
           <TabsContent value="prompt" className="mt-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Card className="rounded-2xl shadow-sm">
@@ -1629,328 +1333,216 @@ export default function Builder() {
                   <CardTitle className="flex items-center gap-2">
                     <Wand2 className="h-5 w-5" /> Inputs
                   </CardTitle>
-                  <CardDescription>Modo Leigo (fácil) ou Avançado (controle total).</CardDescription>
+                  <CardDescription>Modo Avançado (controle total).</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Tabs defaultValue="simple" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="simple">Modo Leigo</TabsTrigger>
-                      <TabsTrigger value="advanced">Avançado</TabsTrigger>
-                    </TabsList>
+                  <div className="space-y-2">
+                    <Label>STYLE LOCK</Label>
+                    <Textarea
+                      value={styleLock}
+                      onChange={(e) => setStyleLock(e.target.value)}
+                      className="min-h-[110px]"
+                    />
+                  </div>
 
-                    <TabsContent value="simple" className="space-y-4 pt-3">
-                      <div className="rounded-2xl border bg-white p-4 space-y-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <div className="text-sm font-semibold">
-                              1) Descrição da cena (1–3 frases)
-                            </div>
-                            <div className="text-xs text-zinc-600">
-                              Ex: “Noctvi segura uma taça e vê a cidade em chamas pela vidraça…”
-                            </div>
-                          </div>
-                          <Sparkles className="h-5 w-5 text-zinc-500" />
-                        </div>
+                  <div className="flex items-center justify-between rounded-xl border p-3">
+                    <div>
+                      <div className="text-sm font-medium">Include FORMAT line</div>
+                      <div className="text-xs text-zinc-600">
+                        Resolution, fps, aspect ratio, duration, rating.
+                      </div>
+                    </div>
+                    <Switch checked={includeFormat} onCheckedChange={setIncludeFormat} />
+                  </div>
+
+                  {includeFormat && (
+                    <div className="space-y-2">
+                      <Label>FORMAT</Label>
+                      <Input value={formatLine} onChange={(e) => setFormatLine(e.target.value)} />
+                    </div>
+                  )}
+
+                  <Separator />
+
+                  <div className="space-y-2">
+                    <Label>{t.proseHeading}</Label>
+                    <Textarea
+                      value={proseScene}
+                      onChange={(e) => setProseScene(e.target.value)}
+                      className="min-h-[200px]"
+                    />
+                  </div>
+
+                  <Separator />
+
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>{t.cameraShotLabel}</Label>
+                      <Select value={shot} onValueChange={(v) => setShot(v as any)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="wide">wide</SelectItem>
+                          <SelectItem value="medium">medium</SelectItem>
+                          <SelectItem value="close-up">close-up</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>{t.cameraMotionLabel}</Label>
+                      <Select value={motion} onValueChange={(v) => setMotion(v as any)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="slow push-in">slow push-in</SelectItem>
+                          <SelectItem value="handheld subtle">handheld subtle</SelectItem>
+                          <SelectItem value="orbit micro">orbit micro</SelectItem>
+                          <SelectItem value="tracking pan">tracking pan</SelectItem>
+                          <SelectItem value="static lock">static lock</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Angle</Label>
+                      <Input
+                        value={angle}
+                        onChange={(e) => setAngle(e.target.value)}
+                        placeholder="low angle / eye-level / dutch tilt..."
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Distance</Label>
+                      <Input
+                        value={distance}
+                        onChange={(e) => setDistance(e.target.value)}
+                        placeholder="rooftop distance / tight framing..."
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>{t.dofLabel} (optional)</Label>
+                      <Select
+                        value={dof || "none"}
+                        onValueChange={(v) => setDof(v === "none" ? "" : (v as any))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">(not specified)</SelectItem>
+                          <SelectItem value="shallow">shallow</SelectItem>
+                          <SelectItem value="deep">deep</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <Label>{t.lightingLabel}</Label>
+                      <Textarea
+                        value={lightingPalette}
+                        onChange={(e) => setLightingPalette(e.target.value)}
+                        className="min-h-[90px]"
+                      />
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>{t.actsHeading}</Label>
+                      <Input value={beat1} onChange={(e) => setBeat1(e.target.value)} placeholder="Beat 1" />
+                      <Input value={beat2} onChange={(e) => setBeat2(e.target.value)} placeholder="Beat 2" />
+                      <Input value={beat3} onChange={(e) => setBeat3(e.target.value)} placeholder="Beat 3" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>{t.perfHeading}</Label>
+                      <Input
+                        value={perf1}
+                        onChange={(e) => setPerf1(e.target.value)}
+                        placeholder={t.perf1Placeholder}
+                      />
+                      <Input
+                        value={perf2}
+                        onChange={(e) => setPerf2(e.target.value)}
+                        placeholder={t.perf2Placeholder}
+                      />
+
+                      <Separator />
+
+                      <div className="space-y-2">
+                        <Label>Hard rules</Label>
                         <Textarea
-                          value={simpleDescription}
-                          onChange={(e) => setSimpleDescription(e.target.value)}
-                          className="min-h-[120px]"
+                          value={hardRules}
+                          onChange={(e) => setHardRules(e.target.value)}
+                          className="min-h-[150px]"
                         />
+                      </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div className="space-y-2">
-                            <Label>2) Quem aparece?</Label>
-                            <Input
-                              value={simpleCharacters}
-                              onChange={(e) => setSimpleCharacters(e.target.value)}
-                              placeholder="Ex: Noctvi (vilão), guarda-costas ao fundo"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>3) Algum detalhe de roupa?</Label>
-                            <Input
-                              value={simpleOutfit}
-                              onChange={(e) => setSimpleOutfit(e.target.value)}
-                              placeholder="Ex: terno escuro, luvas, anel brilhando"
-                            />
+                      <div className="mt-2 flex items-center justify-between rounded-xl border p-3">
+                        <div>
+                          <div className="text-sm font-medium">Include Dialogue block</div>
+                          <div className="text-xs text-zinc-600">
+                            Use only if you want lip sync / speech.
                           </div>
                         </div>
+                        <Switch checked={includeDialogue} onCheckedChange={setIncludeDialogue} />
+                      </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                          <div className="space-y-2">
-                            <Label>4) Onde?</Label>
-                            <Select
-                              value={simplePlace}
-                              onValueChange={(v) => setSimplePlace(v as any)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="penthouse">Penthouse (vidraça)</SelectItem>
-                                <SelectItem value="rooftop">Rooftop</SelectItem>
-                                <SelectItem value="street">Street</SelectItem>
-                                <SelectItem value="alley">Alley</SelectItem>
-                                <SelectItem value="lab">Lab</SelectItem>
-                                <SelectItem value="city skyline">City skyline</SelectItem>
-                                <SelectItem value="interior room">Interior room</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>5) Horário</Label>
-                            <Select
-                              value={simpleTime}
-                              onValueChange={(v) => setSimpleTime(v as any)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="dawn">Dawn</SelectItem>
-                                <SelectItem value="day">Day</SelectItem>
-                                <SelectItem value="sunset">Sunset</SelectItem>
-                                <SelectItem value="night">Night</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>6) Clima</Label>
-                            <Select
-                              value={simpleWeather}
-                              onValueChange={(v) => setSimpleWeather(v as any)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="clear">Clear</SelectItem>
-                                <SelectItem value="rain">Rain</SelectItem>
-                                <SelectItem value="storm">Storm</SelectItem>
-                                <SelectItem value="fog">Fog</SelectItem>
-                                <SelectItem value="windy">Windy</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                          <div className="space-y-2">
-                            <Label>Clima emocional</Label>
-                            <Select
-                              value={simpleMood}
-                              onValueChange={(v) => setSimpleMood(v as any)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="epic">Epic</SelectItem>
-                                <SelectItem value="tense">Tense</SelectItem>
-                                <SelectItem value="mysterious">Mysterious</SelectItem>
-                                <SelectItem value="intimate">Intimate</SelectItem>
-                                <SelectItem value="horror">Horror</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Ritmo</Label>
-                            <Select
-                              value={simplePace}
-                              onValueChange={(v) => setSimplePace(v as any)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="slow">Slow</SelectItem>
-                                <SelectItem value="medium">Medium</SelectItem>
-                                <SelectItem value="fast">Fast</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Enquadramento</Label>
-                            <Select
-                              value={simpleShot}
-                              onValueChange={(v) => setSimpleShot(v as any)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="wide">wide</SelectItem>
-                                <SelectItem value="medium">medium</SelectItem>
-                                <SelectItem value="close-up">close-up</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                          <div className="space-y-2">
-                            <Label>Movimento de câmera</Label>
-                            <Select
-                              value={simpleMotion}
-                              onValueChange={(v) => setSimpleMotion(v as any)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="slow push-in">slow push-in</SelectItem>
-                                <SelectItem value="tracking pan">tracking pan</SelectItem>
-                                <SelectItem value="orbit micro">orbit micro</SelectItem>
-                                <SelectItem value="static lock">static lock</SelectItem>
-                                <SelectItem value="handheld subtle">handheld subtle</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Ângulo</Label>
-                            <Select
-                              value={simpleAngle || "none"}
-                              onValueChange={(v) =>
-                                setSimpleAngle(v === "none" ? "" : (v as any))
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="none">(not specified)</SelectItem>
-                                <SelectItem value="low angle">low angle</SelectItem>
-                                <SelectItem value="eye-level">eye-level</SelectItem>
-                                <SelectItem value="high angle">high angle</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Config</Label>
-                            <div className="grid grid-cols-2 gap-2">
-                              <Select
-                                value={simpleRatio}
-                                onValueChange={(v) => setSimpleRatio(v as any)}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="9:16">9:16</SelectItem>
-                                  <SelectItem value="16:9">16:9</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <Select
-                                value={simpleDuration}
-                                onValueChange={(v) =>
-                                  setSimpleDuration(v as any)
+                      {includeDialogue && (
+                        <div className="space-y-2">
+                          {dialogue.map((d, idx) => (
+                            <div key={d.id} className="grid grid-cols-1 gap-2 rounded-xl border p-3">
+                              <div className="flex items-center justify-between">
+                                <div className="text-xs text-zinc-600">Line {idx + 1}</div>
+                                {dialogue.length > 1 && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => removeDialogueLine(d.id)}
+                                    aria-label="Remove line"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                              <Input
+                                value={d.who}
+                                onChange={(e) =>
+                                  setDialogue((prev) =>
+                                    prev.map((x) =>
+                                      x.id === d.id ? { ...x, who: e.target.value } : x
+                                    )
+                                  )
                                 }
-                              >
-                                <SelectTrigger>
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="5s">5s</SelectItem>
-                                  <SelectItem value="10s">10s</SelectItem>
-                                  <SelectItem value="15s">15s</SelectItem>
-                                </SelectContent>
-                              </Select>
+                                placeholder="Character name"
+                              />
+                              <Input
+                                value={d.line}
+                                onChange={(e) =>
+                                  setDialogue((prev) =>
+                                    prev.map((x) =>
+                                      x.id === d.id ? { ...x, line: e.target.value } : x
+                                    )
+                                  )
+                                }
+                                placeholder='"Short line..."'
+                              />
                             </div>
-                          </div>
+                          ))}
+                          <Button variant="outline" onClick={addDialogueLine} className="gap-2">
+                            <Plus className="h-4 w-4" /> Add line
+                          </Button>
                         </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                          <div className="space-y-2">
-                            <Label>Rating</Label>
-                            <Select
-                              value={simpleRating}
-                              onValueChange={(v) => setSimpleRating(v as any)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="PG">PG</SelectItem>
-                                <SelectItem value="PG-13">PG-13</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label>Efeitos</Label>
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="flex items-center justify-between rounded-xl border p-2">
-                                <span className="text-xs">Glitch</span>
-                                <Switch
-                                  checked={fxGlitch}
-                                  onCheckedChange={setFxGlitch}
-                                />
-                              </div>
-                              <div className="flex items-center justify-between rounded-xl border p-2">
-                                <span className="text-xs">Pixels</span>
-                                <Switch
-                                  checked={fxPixels}
-                                  onCheckedChange={setFxPixels}
-                                />
-                              </div>
-                              <div className="flex items-center justify-between rounded-xl border p-2">
-                                <span className="text-xs">Fire/Smoke</span>
-                                <Switch
-                                  checked={fxFireSmoke}
-                                  onCheckedChange={setFxFireSmoke}
-                                />
-                              </div>
-                              <div className="flex items-center justify-between rounded-xl border p-2">
-                                <span className="text-xs">Lightning</span>
-                                <Switch
-                                  checked={fxLightning}
-                                  onCheckedChange={setFxLightning}
-                                />
-                              </div>
-                              <div className="flex items-center justify-between rounded-xl border p-2">
-                                <span className="text-xs">Rain</span>
-                                <Switch
-                                  checked={fxRainStreaks}
-                                  onCheckedChange={setFxRainStreaks}
-                                />
-                              </div>
-                              <div className="flex items-center justify-between rounded-xl border p-2">
-                                <span className="text-xs">Embers</span>
-                                <Switch
-                                  checked={fxEmbers}
-                                  onCheckedChange={setFxEmbers}
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label>Gerar estrutura</Label>
-                            <Button
-                              onClick={autoBuildFromSimple}
-                              className="w-full gap-2"
-                            >
-                              <Sparkles className="h-4 w-4" /> {t.buildBtn}
-                            </Button>
-                            <div className="text-xs text-zinc-600">
-                              Gera PROSE, CÂMERA, BEATS e ATUAÇÃO automaticamente.
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </TabsContent>
-
-                    {/* Advanced tab (kept minimal; preview is enough for your use) */}
-                    <TabsContent value="advanced" className="space-y-4 pt-3">
-                      <div className="rounded-2xl border bg-white p-4 text-sm text-zinc-700">
-                        O modo avançado já está implementado no código-base (Style/Scene/Camera + Beats + Dialogue).
-                        Se você quiser, eu também te mando essa parte “inteira” bonitinha depois — mas com este arquivo
-                        você já tem o Builder completo funcionando.
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-
-                  <div className="mt-4 text-xs text-zinc-600">{t.simpleHint}</div>
+                      )}
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -1959,9 +1551,7 @@ export default function Builder() {
                   <CardTitle className="flex items-center gap-2">
                     <Copy className="h-5 w-5" /> Live Prompt Preview
                   </CardTitle>
-                  <CardDescription>
-                    O prompt final sempre começa com “Loko-Motion-Style.”
-                  </CardDescription>
+                  <CardDescription>O prompt final sempre começa com “Loko-Motion-Style.”</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="rounded-2xl border bg-white p-3">
