@@ -1,12 +1,3 @@
-<div style={{
-  padding: 8,
-  background: "#fffbcc",
-  borderBottom: "1px solid #e6d200",
-  fontSize: 12
-}}>
-  ✅ STUDIO ATIVO — build: {new Date().toISOString()}
-</div>
-
 "use client";
 
 import { useState } from "react";
@@ -18,7 +9,6 @@ export default function Studio() {
 
   return (
     <div className="w-full">
-      {/* Barra simples de navegação */}
       <div
         style={{
           display: "flex",
@@ -60,7 +50,6 @@ export default function Studio() {
         </button>
       </div>
 
-      {/* Conteúdo */}
       {tab === "builder" ? <Builder /> : <LokoSEO />}
     </div>
   );
