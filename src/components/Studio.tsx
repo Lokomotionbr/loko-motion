@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Builder from "./ui/Builder";
+import Builder from "./Builder";
 import LokoSEO from "./LokoSEO";
 
 export default function Studio() {
